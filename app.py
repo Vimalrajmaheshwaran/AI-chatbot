@@ -5,8 +5,8 @@ import os
 app = Flask(__name__)
 
 # --- CONFIGURATION ---
-# GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-GOOGLE_API_KEY = "Enter your key here" # User must provide their own key
+# This is perfect for GitHub. It keeps your real key safe.
+GOOGLE_API_KEY = "Enter your key here" 
 # ---------------------
 
 client = genai.Client(api_key=GOOGLE_API_KEY)
@@ -15,7 +15,6 @@ client = genai.Client(api_key=GOOGLE_API_KEY)
 def home():
     return render_template('index.html')
 
-@app.route('/chat', methods=['POST'])
 @app.route('/chat', methods=['POST'])
 def chat():
     try:
