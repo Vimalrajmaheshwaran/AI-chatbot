@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vimal's AI Assistant</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #chat-container {
+            width: 100%;
+            max-width: 500px;
+            height: 80vh;
+            background-color: #1e1e1e;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        #chat-header {
+            background-color: #252525;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        #chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 15px;
+            max-width: 80%;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
+        .user-message {
+            background-color: #4CAF50;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .bot-message {
+            background-color: #333333;
+            color: #e0e0e0;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        #input-area {
+            padding: 20px;
+            background-color: #252525;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #333;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 25px;
+            border: 1px solid #444;
+            background-color: #1e1e1e;
+            color: white;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* The Developer Footer */
+        .footer {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="chat-container">
+        <div id="chat-header">
+            AI Assistant
+        </div>
+
+        <div id="chat-box">
+            <div class="message bot-message">
+                Hello! I am Vimal's custom AI assistant. How can I help you today?
+            </div>
+        </div>
+
+        <div id="input-area">
+            <input type="text" id="user-input" placeholder="Type a message..." onkeypress="handleEnter(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        Designed & Developed by <b>Vimalraj M</b> | Powered by Python
+    </div>
+
+    <script>
+
+        function handleEnter(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            let inputField = document.getElementById("user-input");
+            let chatBox = document.getElementById("chat-box");
+            let message = inputField.value.trim();
+
+            if (message === "") return;
+
+            chatBox.innerHTML += `<div class="message user-message">${message}</div>`;
+            inputField.value = ""; // Clear input
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll down
+
+            let loadingID = "loading-" + Date.now();
+            chatBox.innerHTML += `<div id="${loadingID}" class="message bot-message">...</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                let response = await fetch("/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: message })
+                });
+
+                let data = await response.json();
+
+                // 4. Replace "..." with actual response
+                let loadingBubble = document.getElementById(loadingID);
+                loadingBubble.innerHTML = data.response.replace(/\n/g, "<br>");
+
+            } catch (error) {
+                let loadingBubble = document.getElementById(loadingID);
+                loadingBubble.innerHTML = "Error: Could not connect. Server might be down.";
+                loadingBubble.style.color = "#ff4444";
+            }
+        }
+    </script>
+
+</body>
+</html>
